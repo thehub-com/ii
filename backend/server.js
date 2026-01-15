@@ -1,69 +1,43 @@
 import express from "express";
-import fetch from "node-fetch";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// для ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
-
-/* ===== MIDDLEWARE ===== */
+// middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "publish")));
 
-/* ===== HEALTH CHECK ===== */
-app.get("/health", (_, res) => {
-  res.json({ status: "ok" });
-});
+// 👉 FRONTEND
+const frontendPath = path.join(__dirname, "../publish");
+app.use(express.static(frontendPath));
 
-/* ===== CHAT API ===== */
+// 👉 API
 app.post("/api/chat", async (req, res) => {
-  try {
-    const prompt = req.body.prompt;
+  const { prompt } = req.body;
 
-    if (!prompt) {
-      return res.json({ reply: "Пустой запрос." });
-    }
-
-    const response = await fetch(
-      "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Api-Key ${process.env.YA_API_KEY}`
-        },
-        body: JSON.stringify({
-          modelUri: `gpt://${process.env.YA_FOLDER_ID}/yandexgpt-lite`,
-          completionOptions: {
-            stream: false,
-            temperature: 0.6,
-            maxTokens: 300
-          },
-          messages: [
-            { role: "user", text: prompt }
-          ]
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    const reply =
-      data?.result?.alternatives?.[0]?.message?.text ||
-      "Извините, сейчас нет ответа от модели.";
-
-    res.json({ reply });
-
-  } catch (err) {
-    console.error("API ERROR:", err);
-    res.json({ reply: "Ошибка сервера." });
+  if (!prompt) {
+    return res.status(400).json({ error: "Пустой запрос" });
   }
+
+  // временный ответ (проверка связки)
+  res.json({
+    reply: `ABS AI получил: ${prompt}`
+  });
 });
 
-/* ===== START ===== */
-const PORT = process.env.PORT || 10000;
+// 👉 fallback (ОБЯЗАТЕЛЬНО)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+// старт
 app.listen(PORT, () => {
   console.log("ABS AI backend running on port", PORT);
 });
