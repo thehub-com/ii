@@ -1,37 +1,29 @@
 const chat = document.getElementById("chat");
-const input = document.getElementById("prompt");
 const send = document.getElementById("send");
+const promptInput = document.getElementById("prompt");
 
-send.onclick = sendMsg;
-input.onkeydown = e => e.key === "Enter" && sendMsg();
+if (!navigator.onLine) {
+  document.body.innerHTML = `
+    <div style="text-align:center;margin-top:40%">
+      <h2>⏳ Жду подключения к интернету</h2>
+    </div>
+  `;
+}
 
-async function sendMsg() {
-  const text = input.value.trim();
+send.onclick = async () => {
+  const text = promptInput.value.trim();
   if (!text) return;
-  input.value = "";
 
-  chat.innerHTML += `<div class="message user">${text}</div>`;
-  const ai = document.createElement("div");
-  ai.className = "message ai";
-  chat.appendChild(ai);
+  chat.innerHTML += `<div class="msg user">Ты: ${text}</div>`;
+  promptInput.value = "";
 
-  const res = await fetch("/api/chat", {
+  const res = await fetch("https://ii-z1jt.onrender.com/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt: text })
   });
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    decoder.decode(value).split("\n\n").forEach(l => {
-      if (l.startsWith("data: ")) {
-        const d = l.replace("data: ", "");
-        if (d !== "[DONE]") ai.textContent += d + " ";
-      }
-    });
-  }
-}
+  const data = await res.json();
+  chat.innerHTML += `<div class="msg ai">ABS AI: ${data.answer || "Ошибка"}</div>`;
+  chat.scrollTop = chat.scrollHeight;
+};
