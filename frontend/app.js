@@ -1,23 +1,55 @@
-const authScreen = document.getElementById('auth-screen');
-const chatScreen = document.getElementById('chat-screen');
+// ===== DOM =====
+const chat = document.getElementById("chat");
+const input = document.getElementById("prompt");
+const send = document.getElementById("send");
 
-document.getElementById('loginBtn').onclick = () => {
-  authScreen.classList.add('hidden');
-  chatScreen.classList.remove('hidden');
-};
+// ===== utils =====
+function addMessage(author, text) {
+  const msg = document.createElement("div");
+  msg.className = author === "user" ? "msg user" : "msg bot";
+  msg.innerHTML = `<b>${author === "user" ? "Ты" : "ABS AI"}:</b><br>${text}`;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-document.getElementById('send').onclick = () => {
-  const input = document.getElementById('prompt');
-  if (!input.value) return;
+// ===== SEND =====
+send.onclick = sendMessage;
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
 
-  addMsg(input.value, 'user');
-  addMsg('Извините, сейчас нет ответа от модели.', 'bot');
-  input.value = '';
-};
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
 
-function addMsg(text, type) {
-  const div = document.createElement('div');
-  div.className = `message ${type}`;
-  div.innerText = text;
-  document.getElementById('chat').appendChild(div);
+  addMessage("user", text);
+  input.value = "";
+
+  // индикатор
+  const typing = document.createElement("div");
+  typing.className = "msg bot";
+  typing.innerHTML = "<i>ABS AI думает...</i>";
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
+    });
+
+    const data = await res.json();
+    typing.remove();
+
+    if (data.reply) {
+      addMessage("bot", data.reply);
+    } else {
+      addMessage("bot", "Извините, сейчас нет ответа от модели.");
+    }
+
+  } catch (e) {
+    typing.remove();
+    addMessage("bot", "Ошибка соединения с сервером.");
+  }
 }
