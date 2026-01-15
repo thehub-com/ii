@@ -1,0 +1,42 @@
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: Arial;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: #111;
+  color: orange;
+}
+
+#chat {
+  padding: 10px;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.message.user { color: orange; margin-bottom: 10px; }
+.message.ai { color: #0f0; margin-bottom: 10px; }
+
+.input {
+  display: flex;
+  padding: 10px;
+}
+
+input {
+  flex: 1;
+  background: #111;
+  color: white;
+  border: none;
+  padding: 10px;
+}
+
+button {
+  background: orange;
+  border: none;
+  padding: 10px;
+}
