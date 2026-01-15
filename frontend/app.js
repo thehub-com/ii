@@ -1,29 +1,23 @@
-const chat = document.getElementById("chat");
-const send = document.getElementById("send");
-const promptInput = document.getElementById("prompt");
+const authScreen = document.getElementById('auth-screen');
+const chatScreen = document.getElementById('chat-screen');
 
-if (!navigator.onLine) {
-  document.body.innerHTML = `
-    <div style="text-align:center;margin-top:40%">
-      <h2>⏳ Жду подключения к интернету</h2>
-    </div>
-  `;
-}
-
-send.onclick = async () => {
-  const text = promptInput.value.trim();
-  if (!text) return;
-
-  chat.innerHTML += `<div class="msg user">Ты: ${text}</div>`;
-  promptInput.value = "";
-
-  const res = await fetch("https://ii-z1jt.onrender.com/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: text })
-  });
-
-  const data = await res.json();
-  chat.innerHTML += `<div class="msg ai">ABS AI: ${data.answer || "Ошибка"}</div>`;
-  chat.scrollTop = chat.scrollHeight;
+document.getElementById('loginBtn').onclick = () => {
+  authScreen.classList.add('hidden');
+  chatScreen.classList.remove('hidden');
 };
+
+document.getElementById('send').onclick = () => {
+  const input = document.getElementById('prompt');
+  if (!input.value) return;
+
+  addMsg(input.value, 'user');
+  addMsg('Извините, сейчас нет ответа от модели.', 'bot');
+  input.value = '';
+};
+
+function addMsg(text, type) {
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  div.innerText = text;
+  document.getElementById('chat').appendChild(div);
+}
