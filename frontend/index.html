@@ -1,98 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>ABS AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="header">
-  <div class="menu">☰</div>
-  <div class="title">ABS AI</div>
-  <div class="plus">＋</div>
-</header>
-
-<!-- ===== AUTH ===== -->
-<div id="auth" class="auth-container">
-
-  <h1>ABS AI</h1>
-
-  <input
-    id="email"
-    type="email"
-    placeholder="Email"
-    autocomplete="email"
-  />
-
-  <input
-    id="password"
-    type="password"
-    placeholder="Пароль"
-    autocomplete="current-password"
-  />
-
-  <button id="login" class="btn primary">
-    Войти
-  </button>
-
-  <button id="register" class="btn secondary">
-    Зарегистрироваться
-  </button>
-
-  <button id="google" class="btn google">
-    Войти через Google
-  </button>
-
+<!-- ===== REGISTRATION ===== -->
+<div id="auth-screen" class="screen">
+  <div class="auth-box">
+    <h1>ABS AI</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Пароль">
+    <button id="loginBtn">Войти</button>
+  </div>
 </div>
 
 <!-- ===== CHAT ===== -->
-<div id="chatContainer" class="chat hidden">
+<div id="chat-screen" class="screen hidden">
+
+  <header class="header">
+    <div class="menu">≡</div>
+    <div class="title">ABS AI</div>
+    <div class="add">+</div>
+  </header>
 
   <div id="chat"></div>
 
-  <div class="input-box">
-    <input
-      id="prompt"
-      placeholder="Спроси ABS AI..."
-      autocomplete="off"
-    />
+  <div class="input-bar">
+    <input id="prompt" placeholder="Спроси ABS AI...">
     <button id="send">➤</button>
   </div>
 
 </div>
 
-<!-- ===== OFFLINE ===== -->
-<div id="offline" class="offline hidden">
-  <div class="clock">🕒</div>
-  <p>Жду подключения к интернету…</p>
-</div>
-
-<!-- ===== SCRIPTS ===== -->
-<script type="module" src="firebase.js"></script>
-<script type="module" src="auth.js"></script>
-<script type="module" src="app.js"></script>
-
-<script>
-  // OFFLINE MODE
-  function updateConnection() {
-    const offline = document.getElementById("offline");
-    if (!navigator.onLine) {
-      offline.classList.remove("hidden");
-    } else {
-      offline.classList.add("hidden");
-    }
-  }
-
-  window.addEventListener("online", updateConnection);
-  window.addEventListener("offline", updateConnection);
-  updateConnection();
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
